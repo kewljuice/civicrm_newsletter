@@ -2,9 +2,11 @@
 
 namespace Drupal\civicrm_newsletter\Plugin\Block;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -60,6 +62,21 @@ class NewsletterManage extends BlockBase implements ContainerFactoryPluginInterf
   public function build() {
     // Return form.
     return $this->formBuilder->getForm('Drupal\civicrm_newsletter\Form\NewsletterManage');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function blockAccess(AccountInterface $account) {
+    // Bail if anonymous!
+    if ($account->isAnonymous()) {
+      // For anonymous, the block is forbidden.
+      return AccessResult::forbidden();
+    }
+    else {
+      // For authenticated, the block is allowed.
+      return AccessResult::allowed();
+    }
   }
 
 }
