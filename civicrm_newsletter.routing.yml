@@ -1,0 +1,9 @@
+civicrm_newsletter.settings_form:
+  path: '/admin/config/civicrm_newsletter/settings'
+  defaults:
+    _form: '\Drupal\civicrm_newsletter\Form\NewsletterSettings'
+    _title: 'CiviCRM Newsletter'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE

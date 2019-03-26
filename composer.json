@@ -1,0 +1,10 @@
+{
+  "name": "kewljuice/civicrm_newsletter",
+  "description": "Everything functionally related to CiviCRM Newsletter.",
+  "type": "drupal-module",
+  "license": "AGPL-3.0",
+  "keywords": [
+    "Drupal 8",
+    "CiviCRM"
+  ]
+}

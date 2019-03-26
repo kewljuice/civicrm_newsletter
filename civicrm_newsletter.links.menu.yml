@@ -1,0 +1,6 @@
+civicrm_newsletter.settings_form:
+  title: 'CiviCRM Newsletter'
+  route_name: civicrm_newsletter.settings_form
+  description: 'Configure CiviCRM Newsletter'
+  parent: system.admin_config_system
+  weight: 99

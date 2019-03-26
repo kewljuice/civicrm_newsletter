@@ -1,0 +1,4 @@
+services:
+  civicrm_newsletter.list:
+    class: 'Drupal\civicrm_newsletter\Utility\NewsLetter'
+    arguments: ['@civicrm', '@logger.factory']

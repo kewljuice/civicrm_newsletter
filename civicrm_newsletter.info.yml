@@ -1,0 +1,8 @@
+name: CiviCRM Newsletter
+type: module
+description: Everything functionally related to CiviCRM Newsletter.
+core: 8.x
+package: CiviCRM
+
+dependencies:
+  - drupal:civicrm
