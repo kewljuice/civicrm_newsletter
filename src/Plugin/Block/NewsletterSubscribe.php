@@ -4,9 +4,10 @@ namespace Drupal\civicrm_newsletter\Plugin\Block;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockBase;
-use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -28,6 +29,13 @@ class NewsletterSubscribe extends BlockBase implements ContainerFactoryPluginInt
   protected $formBuilder;
 
   /**
+   * The Config.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $config;
+
+  /**
    * Constructs a FormBuilder object.
    *
    * @param array $configuration
@@ -38,10 +46,13 @@ class NewsletterSubscribe extends BlockBase implements ContainerFactoryPluginInt
    *   The plugin implementation definition.
    * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
    *   The Form Builder.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory services.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, FormBuilderInterface $form_builder) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, FormBuilderInterface $form_builder, ConfigFactoryInterface $config_factory) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->formBuilder = $form_builder;
+    $this->config = $config_factory;
   }
 
   /**
@@ -52,7 +63,8 @@ class NewsletterSubscribe extends BlockBase implements ContainerFactoryPluginInt
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('form_builder')
+      $container->get('form_builder'),
+      $container->get('config.factory')
     );
   }
 
@@ -68,6 +80,11 @@ class NewsletterSubscribe extends BlockBase implements ContainerFactoryPluginInt
    * {@inheritdoc}
    */
   protected function blockAccess(AccountInterface $account) {
+    // Bail if no groups are defined!
+    $allowed = $this->config->get('civicrm_newsletter.settings')->get('default');
+    if (empty(array_filter($allowed))) {
+      return AccessResult::forbidden();
+    }
     // Bail if authenticated!
     if ($account->isAuthenticated()) {
       // For anonymous, the block is forbidden.

@@ -63,6 +63,13 @@ class NewsletterManage extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     // Parameters.
     $list = $this->newsletter->get();
+    $allowed = $this->config('civicrm_newsletter.settings')->get('manage');
+    // Limit list to selection.
+    foreach ($list as $key => $value) {
+      if ($allowed[$key] == 0) {
+        unset($list[$key]);
+      }
+    }
     $default = $this->newsletter->getDefault();
     // Form components.
     $form['list'] = [
