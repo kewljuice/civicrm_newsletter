@@ -82,7 +82,7 @@ class NewsletterManage extends BlockBase implements ContainerFactoryPluginInterf
   protected function blockAccess(AccountInterface $account) {
     // Bail if no groups are defined!
     $allowed = $this->config->get('civicrm_newsletter.settings')->get('manage');
-    if (empty(array_filter($allowed))) {
+    if (!isset($allowed) || empty(array_filter($allowed))) {
       return AccessResult::forbidden();
     }
     // Bail if anonymous!
