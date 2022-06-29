@@ -86,7 +86,7 @@ class NewsletterSubscribe extends BlockBase implements ContainerFactoryPluginInt
       return AccessResult::forbidden();
     }
     // Bail if authenticated!
-    if ($account->isAuthenticated()) {
+    if ($account->isAuthenticated() && $account->id() != '1') {
       // For anonymous, the block is forbidden.
       return AccessResult::forbidden();
     }
