@@ -75,6 +75,9 @@ class NewsLetter implements NewsletterInterface {
       'group_type' => 'Mailing List',
       'contact_id' => 'user_contact_id',
       'is_active' => 1,
+      'options' => [
+        'limit' => 1000,
+      ],
     ]);
     // Loop API results.
     $group_list = [];
@@ -95,6 +98,9 @@ class NewsLetter implements NewsletterInterface {
       'return' => ['id', 'name', 'title'],
       'group_type' => 'Mailing List',
       'is_active' => 1,
+      'options' => [
+        'limit' => 1000,
+      ],
     ]);
     // Loop API results.
     $group_list = [];
