@@ -108,15 +108,21 @@ class NewsLetter implements NewsletterInterface {
   /**
    * {@inheritdoc}
    */
-  public function createSubscription($email, $groups) {
-    $result = ['email' => $email, 'groups' => $groups];
-    // Save Contact.
-    $contact = $this->api('Contact', 'Create', [
+  public function createSubscription($params, $groups) {
+    $result = [
+      'params' => $params,
+      'groups' => $groups,
+    ];
+
+    $default = [
       'sequential' => 1,
       'contact_type' => 'Individual',
       'source' => $this->t('Newsletter subscription'),
-      'email' => $email,
-    ]);
+    ];
+
+    // Save Contact.
+    $contact = $this->api('Contact', 'Create', array_merge($default, $params));
+
     $result['contact_id'] = $contact['id'];
     foreach ($groups as $key => $value) {
       if ($value != 0) {

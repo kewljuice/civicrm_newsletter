@@ -26,15 +26,15 @@ interface NewsletterInterface {
   /**
    * Creates mailing subscription(s) via the CiviCRM api.
    *
-   * @param string $email
-   *   The email address.
+   * @param array $params
+   *   The array with parameters.
    * @param mixed $groups
    *   The newsletter group(s).
    *
    * @return array
    *   An array with result(s).
    */
-  public function createSubscription($email, $groups);
+  public function createSubscription($params, $groups);
 
   /**
    * Updates mailing subscription(s) via the CiviCRM api.

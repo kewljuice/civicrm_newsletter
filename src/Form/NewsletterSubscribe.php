@@ -101,7 +101,7 @@ class NewsletterSubscribe extends FormBase {
     $email = $form_state->getValue('email');
     $group = $this->config('civicrm_newsletter.settings')->get('default');
     // Create.
-    $this->newsletter->createSubscription($email, $group);
+    $this->newsletter->createSubscription(['email' => $email], $group);
     // Display the results.
     $this->messenger->addMessage($this->t('The subscription has been submitted.'));
   }
