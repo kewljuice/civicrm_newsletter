@@ -3,6 +3,6 @@ description: Everything functionally related to CiviCRM Newsletter.
 package: CiviCRM
 type: module
 core_version_requirement: ^8 || ^9
-
+configure: civicrm_newsletter.settings_form
 dependencies:
   - drupal:civicrm
