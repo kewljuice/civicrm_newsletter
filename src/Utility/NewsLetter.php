@@ -170,4 +170,52 @@ class NewsLetter implements NewsletterInterface {
     return $result;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isContactSubscribed($groups, $contact_id = 'user_contact_id') {
+    $result = [];
+
+    foreach ($groups as $key => $value) {
+      if ($value != 0) {
+        // Add contact to group.
+        $result = $this->api('Contact', 'get', [
+          'sequential' => 1,
+          'group' => $key,
+          'id' => $contact_id,
+        ]);
+      }
+    }
+    return !empty($result['values']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function subscribeContact($groups, $contact_id = 'user_contact_id') {
+    $result = [];
+
+    foreach ($groups as $key => $value) {
+      if ($value != 0) {
+        // Add contact to group.
+        $result[] = $this->api('GroupContact', 'Create', [
+          'group_id' => $key,
+          'contact_id' => $contact_id,
+          'status' => 'Added',
+        ]);
+      }
+    }
+    return $result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContactDetails($contact_id = 'user_contact_id') {
+    return $this->api('Contact', 'get', [
+      'sequential' => 1,
+      'id' => $contact_id,
+    ]);
+  }
+
 }
