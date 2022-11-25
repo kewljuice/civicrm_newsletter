@@ -47,4 +47,44 @@ interface NewsletterInterface {
    */
   public function updateSubscription($groups);
 
+  /**
+   * Checks if the given contact is subscribed to the supplied group(s).
+   *
+   * @param mixed $groups
+   *   The newsletter group(s).
+   * @param string $contact_id
+   *   The supplied contact_id.
+   *   Defaults to 'user_contact_id'.
+   *
+   * @return bool
+   *   Returns if the contact is subscribed to the supplied group(s) or not.
+   */
+  public function isContactSubscribed($groups, $contact_id = 'user_contact_id');
+
+  /**
+   * Subscribes the supplied contact to the supplied group(s).
+   *
+   * @param mixed $groups
+   *   The newsletter group(s).
+   * @param string $contact_id
+   *   The supplied contact_id.
+   *   Defaults to 'user_contact_id'.
+   *
+   * @return mixed
+   *   An array with result(s).
+   */
+  public function subscribeContact($groups, $contact_id = 'user_contact_id');
+
+  /**
+   * Gets the contact information of the supplied contact.
+   *
+   * @param string $contact_id
+   *   The supplied contact_id.
+   *   Defaults to 'user_contact_id'.
+   *
+   * @return mixed
+   *   Returns the API result.
+   */
+  public function getContactDetails($contact_id = 'user_contact_id');
+
 }

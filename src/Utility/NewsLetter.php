@@ -174,19 +174,24 @@ class NewsLetter implements NewsletterInterface {
    * {@inheritdoc}
    */
   public function isContactSubscribed($groups, $contact_id = 'user_contact_id') {
-    $result = [];
+    $subscribed = TRUE;
 
     foreach ($groups as $key => $value) {
       if ($value != 0) {
-        // Add contact to group.
         $result = $this->api('Contact', 'get', [
           'sequential' => 1,
           'group' => $key,
           'id' => $contact_id,
         ]);
+
+        // If we found a group and the contact was not in it, he is not subscribed to all available groups.
+        if (empty($result['values'])) {
+          $subscribed = FALSE;
+          break;
+        }
       }
     }
-    return !empty($result['values']);
+    return $subscribed;
   }
 
   /**
