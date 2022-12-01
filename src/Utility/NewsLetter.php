@@ -184,7 +184,8 @@ class NewsLetter implements NewsletterInterface {
           'id' => $contact_id,
         ]);
 
-        // If we found a group and the contact was not in it, he is not subscribed to all available groups.
+        // If we found a group and the contact was not in it,
+        // he is not subscribed to all available groups.
         if (empty($result['values'])) {
           $subscribed = FALSE;
           break;

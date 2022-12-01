@@ -2,12 +2,13 @@
 
 namespace Drupal\civicrm_newsletter\Plugin\Block;
 
-use Drupal\civicrm_newsletter\Utility\NewsLetter;
+use Drupal\civicrm_newsletter\Utility\NewsletterInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountProxyInterface;
@@ -53,6 +54,13 @@ class NewsletterAuthenticatedSubscribe extends BlockBase implements ContainerFac
   protected $account;
 
   /**
+   * The Language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Constructs a FormBuilder object.
    *
    * @param array $configuration
@@ -65,13 +73,20 @@ class NewsletterAuthenticatedSubscribe extends BlockBase implements ContainerFac
    *   The Form Builder.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory services.
+   * @param \Drupal\civicrm_newsletter\Utility\NewsletterInterface $newsletter
+   *   The newsletter utility.
+   * @param \Drupal\Core\Session\AccountProxyInterface $account
+   *   The account interface.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, FormBuilderInterface $form_builder, ConfigFactoryInterface $config_factory, NewsLetter $newsletter, AccountProxyInterface $account) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, FormBuilderInterface $form_builder, ConfigFactoryInterface $config_factory, NewsletterInterface $newsletter, AccountProxyInterface $account, LanguageManagerInterface $language_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->formBuilder = $form_builder;
     $this->config = $config_factory;
     $this->newsletter = $newsletter;
     $this->account = $account;
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -85,7 +100,8 @@ class NewsletterAuthenticatedSubscribe extends BlockBase implements ContainerFac
       $container->get('form_builder'),
       $container->get('config.factory'),
       $container->get('civicrm_newsletter.list'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('language_manager')
     );
   }
 
@@ -129,18 +145,20 @@ class NewsletterAuthenticatedSubscribe extends BlockBase implements ContainerFac
     $allowed = $this->config->get('civicrm_newsletter.settings')->get('default');
     // Return form.
     if ($this->newsletter->isContactSubscribed($allowed)) {
-      $markup = '<p>' . t('You are already subscribed to our newsletter.') . '</p>';
+      $markup = '<p>' . $this->t('You are already subscribed to our newsletter.') . '</p>';
       if ($this->configuration['manage_subscription_url'] !== '') {
-        $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
-        $url = '/' . $language . $this->configuration['manage_subscription_url'];
-        $markup .= t('<p>You can manage your subscriptions <a href="@link">here</a>.</p>', ['@link' => $url]);
+        $language = $this->languageManager->getCurrentLanguage()->getId();
+        $url = $language ? '/' . $language : '';
+        $url .= $this->configuration['manage_subscription_url'];
+        $markup .= $this->t('<p>You can manage your subscriptions <a href="@link">here</a>.</p>', ['@link' => $url]);
       }
 
       return [
         '#type' => 'markup',
         '#markup' => $markup,
       ];
-    } else {
+    }
+    else {
       return $this->formBuilder->getForm('Drupal\civicrm_newsletter\Form\NewsletterAuthenticatedSubscribe');
     }
   }

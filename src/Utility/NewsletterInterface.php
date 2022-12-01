@@ -34,7 +34,7 @@ interface NewsletterInterface {
    * @return array
    *   An array with result(s).
    */
-  public function createSubscription($params, $groups);
+  public function createSubscription(array $params, $groups);
 
   /**
    * Updates mailing subscription(s) via the CiviCRM api.

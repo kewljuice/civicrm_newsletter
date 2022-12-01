@@ -53,6 +53,8 @@ class NewsletterAuthenticatedSubscribe extends FormBase {
    *   The messenger service.
    * @param \Drupal\civicrm_newsletter\Utility\NewsLetterInterface $newsletter
    *   The Newsletter service.
+   * @param \Drupal\Core\Session\AccountProxyInterface $account
+   *   The account interface.
    */
   public function __construct(MessengerInterface $messenger, NewsLetterInterface $newsletter, AccountProxyInterface $account) {
     $this->messenger = $messenger;
@@ -98,7 +100,7 @@ class NewsletterAuthenticatedSubscribe extends FormBase {
         '#required'      => TRUE,
         '#disabled'      => TRUE,
         '#attributes'    => ['placeholder' => $this->t('First name')],
-        '#default_value' => $default_values['first_name']
+        '#default_value' => $default_values['first_name'],
       ];
 
       $form['last_name'] = [
@@ -106,7 +108,7 @@ class NewsletterAuthenticatedSubscribe extends FormBase {
         '#required'      => TRUE,
         '#disabled'      => TRUE,
         '#attributes'    => ['placeholder' => $this->t('Last name')],
-        '#default_value' => $default_values['last_name']
+        '#default_value' => $default_values['last_name'],
       ];
     }
 
@@ -116,7 +118,7 @@ class NewsletterAuthenticatedSubscribe extends FormBase {
       '#disabled'      => TRUE,
       '#attributes'    => ['placeholder' => $this->t('Email')],
       '#description'   => $this->t('Please enter email address, read and accept the terms of use of the site.'),
-      '#default_value' => $default_values['email']
+      '#default_value' => $default_values['email'],
     ];
 
     $form['accept'] = [
