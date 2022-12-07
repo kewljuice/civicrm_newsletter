@@ -6,8 +6,10 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormBuilderInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -36,6 +38,20 @@ class NewsletterSubscribe extends BlockBase implements ContainerFactoryPluginInt
   protected $config;
 
   /**
+   * The current logged in user.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
+  protected $account;
+
+  /**
+   * The messenger.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * Constructs a FormBuilder object.
    *
    * @param array $configuration
@@ -48,11 +64,17 @@ class NewsletterSubscribe extends BlockBase implements ContainerFactoryPluginInt
    *   The Form Builder.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory services.
+   * @param \Drupal\Core\Session\AccountProxyInterface $account
+   *   The account interface.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, FormBuilderInterface $form_builder, ConfigFactoryInterface $config_factory) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, FormBuilderInterface $form_builder, ConfigFactoryInterface $config_factory, AccountProxyInterface $account, MessengerInterface $messenger) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->formBuilder = $form_builder;
     $this->config = $config_factory;
+    $this->account = $account;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -64,7 +86,9 @@ class NewsletterSubscribe extends BlockBase implements ContainerFactoryPluginInt
       $plugin_id,
       $plugin_definition,
       $container->get('form_builder'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('current_user'),
+      $container->get('messenger')
     );
   }
 
@@ -72,6 +96,15 @@ class NewsletterSubscribe extends BlockBase implements ContainerFactoryPluginInt
    * {@inheritdoc}
    */
   public function build() {
+    if ($this->account->id() == 1) {
+      $this->messenger->addMessage(
+        $this->t(
+          "Displaying newsletter subscribe block on this page as a result of the current user's unique permissions."
+        ),
+        $this->messenger::TYPE_STATUS
+      );
+    }
+
     // Return form.
     return $this->formBuilder->getForm('Drupal\civicrm_newsletter\Form\NewsletterSubscribe');
   }
