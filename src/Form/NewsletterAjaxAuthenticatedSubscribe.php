@@ -3,6 +3,8 @@
 namespace Drupal\civicrm_newsletter\Form;
 
 use Drupal\civicrm_newsletter\Utility\NewsletterInterface;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -12,7 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Class NewsletterAuthenticatedSubscribe.
  */
-class NewsletterAuthenticatedSubscribe extends FormBase {
+class NewsletterAjaxAuthenticatedSubscribe extends FormBase {
 
   /**
    * The Messenger service.
@@ -66,7 +68,7 @@ class NewsletterAuthenticatedSubscribe extends FormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'civicrm_newsletter_form_subscribe_authenticated';
+    return 'civicrm_newsletter_ajax_form_subscribe_authenticated';
   }
 
   /**
@@ -130,6 +132,9 @@ class NewsletterAuthenticatedSubscribe extends FormBase {
     $form['actions']['submit'] = [
       '#type'  => 'submit',
       '#value' => $this->t('Subscribe'),
+      '#ajax'  => [
+        'callback' => '::ajaxSubmitForm',
+      ],
     ];
 
     return $form;
@@ -151,12 +156,30 @@ class NewsletterAuthenticatedSubscribe extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+  }
+
+  /**
+   * Callback for submission.
+   *
+   * Subscribe the contact and replace the form with a message.
+   *
+   * @return mixed
+   *   The AJAX response.
+   */
+  public function ajaxSubmitForm(array &$form, FormStateInterface $form_state) {
+    $response = new AjaxResponse();
+
     // Groups.
     $group = $this->config('civicrm_newsletter.settings')->get('default');
-    // Create the subscription for the existing user.
-    $this->newsletter->subscribeContact($group);
-    // Display the results.
-    $this->messenger->addMessage($this->t('The subscription has been submitted.'));
+    if (!$this->newsletter->isContactSubscribed($group)) {
+      // Create the subscription for the existing user.
+      $this->newsletter->subscribeContact($group);
+    }
+
+    $div = '<p>' . $this->t('The subscription has been submitted.') . '</p>';
+    $response->addCommand(new ReplaceCommand('#civicrm-newsletter-ajax-form-subscribe-authenticated', $div));
+
+    return $response;
   }
 
 }

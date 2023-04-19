@@ -111,6 +111,7 @@ class NewsletterAuthenticatedSubscribe extends BlockBase implements ContainerFac
   public function defaultConfiguration() {
     return [
       'manage_subscription_url' => '',
+      'ajax_form'               => '',
     ];
   }
 
@@ -127,6 +128,13 @@ class NewsletterAuthenticatedSubscribe extends BlockBase implements ContainerFac
       '#default_value' => $this->configuration['manage_subscription_url'],
     ];
 
+    $form['ajax_form'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Ajax Form'),
+      '#description' => $this->t('Use AJAX to prevent a page reloads upon submission.'),
+      '#default_value' => $this->configuration['ajax_form'],
+    ];
+
     return $form;
   }
 
@@ -136,6 +144,7 @@ class NewsletterAuthenticatedSubscribe extends BlockBase implements ContainerFac
   public function blockSubmit($form, FormStateInterface $form_state) {
     $values = $form_state->getValues();
     $this->configuration['manage_subscription_url'] = $values['manage_subscription_url'];
+    $this->configuration['ajax_form'] = $values['ajax_form'];
   }
 
   /**
@@ -159,7 +168,12 @@ class NewsletterAuthenticatedSubscribe extends BlockBase implements ContainerFac
       ];
     }
     else {
-      return $this->formBuilder->getForm('Drupal\civicrm_newsletter\Form\NewsletterAuthenticatedSubscribe');
+      if ($this->configuration['ajax_form']) {
+        return $this->formBuilder->getForm('Drupal\civicrm_newsletter\Form\NewsletterAjaxAuthenticatedSubscribe');
+      }
+      else {
+        return $this->formBuilder->getForm('Drupal\civicrm_newsletter\Form\NewsletterAuthenticatedSubscribe');
+      }
     }
   }
 
