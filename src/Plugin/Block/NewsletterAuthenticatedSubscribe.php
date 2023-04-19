@@ -183,4 +183,11 @@ class NewsletterAuthenticatedSubscribe extends BlockBase implements ContainerFac
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge() {
+    return 0;
+  }
+
 }
