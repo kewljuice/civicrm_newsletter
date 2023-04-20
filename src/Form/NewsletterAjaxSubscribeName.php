@@ -3,15 +3,17 @@
 namespace Drupal\civicrm_newsletter\Form;
 
 use Drupal\civicrm_newsletter\Utility\NewsletterInterface;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class NewsletterSubscribeName.
+ * Class NewsletterAjaxSubscribeName.
  */
-class NewsletterSubscribeName extends FormBase {
+class NewsletterAjaxSubscribeName extends FormBase {
 
   /**
    * The Messenger service.
@@ -54,7 +56,7 @@ class NewsletterSubscribeName extends FormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'civicrm_newsletter_form_subscribe_name_email';
+    return 'civicrm_newsletter_ajax_form_subscribe_name_email';
   }
 
   /**
@@ -86,11 +88,16 @@ class NewsletterSubscribeName extends FormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('I accept the terms of use of the site'),
     ];
+
     // Add a submit button that handles the submission of the form.
     $form['actions']['submit'] = [
-      '#type' => 'submit',
+      '#type'  => 'submit',
       '#value' => $this->t('Subscribe'),
+      '#ajax'  => [
+        'callback' => '::ajaxSubmitForm',
+      ],
     ];
+
     return $form;
   }
 
@@ -110,21 +117,42 @@ class NewsletterSubscribeName extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+  }
+
+  /**
+   * Callback for submission.
+   *
+   * Subscribe the contact and replace the form with a message.
+   *
+   * @return mixed
+   *   The AJAX response.
+   */
+  public function ajaxSubmitForm(array &$form, FormStateInterface $form_state) {
+    $response = new AjaxResponse();
+
+    // Groups.
+    $group = $this->config('civicrm_newsletter.settings')->get('default');
+
     // Parameters.
     $firstName = $form_state->getValue('first_name');
     $lastName = $form_state->getValue('last_name');
     $email = $form_state->getValue('email');
-    $group = $this->config('civicrm_newsletter.settings')->get('default');
+
     // Important the that key equals the CiviCRM field key.
     $params = [
-      'first_name'  => $firstName,
-      'last_name'   => $lastName,
-      'email'       => $email,
+      'first_name' => $firstName,
+      'last_name' => $lastName,
+      'email' => $email,
     ];
+
     // Create.
     $this->newsletter->createSubscription($params, $group);
+
     // Display the results.
-    $this->messenger->addMessage($this->t('The subscription has been submitted.'));
+    $div = '<div class="civicrm-newsletter-confirmation-message"><p>' . $this->t('The subscription has been submitted.') . '</p></div>';
+    $response->addCommand(new ReplaceCommand('#civicrm-newsletter-ajax-form-subscribe-name-email', $div));
+
+    return $response;
   }
 
 }

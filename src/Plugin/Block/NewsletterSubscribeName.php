@@ -6,6 +6,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormBuilderInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -95,6 +96,37 @@ class NewsletterSubscribeName extends BlockBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
+  public function defaultConfiguration() {
+    return [
+      'ajax_form' => '',
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function blockForm($form, FormStateInterface $form_state) {
+    $form['ajax_form'] = [
+      '#type'          => 'checkbox',
+      '#title'         => $this->t('Ajax Form'),
+      '#description'   => $this->t('Use AJAX to prevent a page reloads upon submission.'),
+      '#default_value' => $this->configuration['ajax_form'],
+    ];
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function blockSubmit($form, FormStateInterface $form_state) {
+    $values = $form_state->getValues();
+    $this->configuration['ajax_form'] = $values['ajax_form'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function build() {
     if ($this->account->id() == 1) {
       $this->messenger->addMessage(
@@ -106,7 +138,12 @@ class NewsletterSubscribeName extends BlockBase implements ContainerFactoryPlugi
     }
 
     // Return form.
-    return $this->formBuilder->getForm('Drupal\civicrm_newsletter\Form\NewsletterSubscribeName');
+    if ($this->configuration['ajax_form']) {
+      return $this->formBuilder->getForm('Drupal\civicrm_newsletter\Form\NewsletterAjaxSubscribeName');
+    }
+    else {
+      return $this->formBuilder->getForm('Drupal\civicrm_newsletter\Form\NewsletterSubscribeName');
+    }
   }
 
   /**
