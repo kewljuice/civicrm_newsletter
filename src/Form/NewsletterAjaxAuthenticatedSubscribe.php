@@ -176,7 +176,7 @@ class NewsletterAjaxAuthenticatedSubscribe extends FormBase {
       $this->newsletter->subscribeContact($group);
     }
 
-    $div = '<p>' . $this->t('The subscription has been submitted.') . '</p>';
+    $div = '<div class="civicrm-newsletter-confirmation-message"><p>' . $this->t('The subscription has been submitted.') . '</p></div>';
     $response->addCommand(new ReplaceCommand('#civicrm-newsletter-ajax-form-subscribe-authenticated', $div));
 
     return $response;
