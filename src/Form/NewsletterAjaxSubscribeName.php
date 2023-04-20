@@ -149,7 +149,7 @@ class NewsletterAjaxSubscribeName extends FormBase {
     $this->newsletter->createSubscription($params, $group);
 
     // Display the results.
-    $div = '<p>' . $this->t('The subscription has been submitted.') . '</p>';
+    $div = '<div class="civicrm-newsletter-confirmation-message"><p>' . $this->t('The subscription has been submitted.') . '</p></div>';
     $response->addCommand(new ReplaceCommand('#civicrm-newsletter-ajax-form-subscribe-name-email', $div));
 
     return $response;
